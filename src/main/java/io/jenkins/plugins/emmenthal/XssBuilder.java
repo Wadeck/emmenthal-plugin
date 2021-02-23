@@ -29,9 +29,11 @@ import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Job;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.DoNotUse;
@@ -39,6 +41,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -46,12 +49,14 @@ import java.io.PrintWriter;
 public class XssBuilder extends Builder {
 
     private String name;
+    private String identity;
     private String shortDescription;
     private String longDescription;
     private String style;
 
     private String pattern;
     private String patternTimes;
+
 
     @DataBoundConstructor
     public XssBuilder() {
@@ -64,6 +69,15 @@ public class XssBuilder extends Builder {
 
     public String getName() {
         return name;
+    }
+
+    @DataBoundSetter
+    public void setIdentity(String identity) {
+        this.identity = identity;
+    }
+
+    public String getIdentity() {
+        return Util.fixNull(identity).replaceAll(" ", "");
     }
 
     @DataBoundSetter
@@ -124,6 +138,7 @@ public class XssBuilder extends Builder {
             return "[emmenthal] XSS Builder";
         }
 
+        @RequirePOST
         @Restricted(DoNotUse.class)
         public FormValidation doCheckName(@QueryParameter String value) {
             value = Util.fixEmptyAndTrim(value);
@@ -134,8 +149,10 @@ public class XssBuilder extends Builder {
             return FormValidation.ok();
         }
 
+        @RequirePOST
         @Restricted(DoNotUse.class)
         public FormValidation doCheckShortDescription(@QueryParameter String value) {
+            Jenkins.get().checkPermission(Job.CONFIGURE);
             value = Util.fixEmptyAndTrim(value);
             if (value == null) {
                 return FormValidation.ok();
@@ -148,8 +165,10 @@ public class XssBuilder extends Builder {
             return FormValidation.ok();
         }
 
+        @RequirePOST
         @Restricted(DoNotUse.class)
         public FormValidation doCheckLongDescription(@QueryParameter String value) {
+            Jenkins.get().checkPermission(Job.CONFIGURE);
             value = Util.fixEmptyAndTrim(value);
             if (value == null) {
                 return FormValidation.ok();
@@ -164,6 +183,7 @@ public class XssBuilder extends Builder {
         
         @Restricted(DoNotUse.class)
         public HttpResponse doPreviewDescription(@QueryParameter String longDescription, @QueryParameter String style) {
+            Jenkins.get().checkPermission(Job.CONFIGURE);
             String html = "<div style='" + style + "'>" + longDescription + "</div>";
             return (req, rsp, node) -> {
                 rsp.setContentType("text/html;charset=UTF-8");
