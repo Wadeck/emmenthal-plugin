@@ -112,7 +112,7 @@ public class XxeBuilder extends Builder {
             }
             
             Node result = resultList.item(0);
-            return FormValidation.ok("Found: " + result.getTextContent());
+            return FormValidation.okWithMarkup("Found: " + result.getTextContent());
         }
 
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
