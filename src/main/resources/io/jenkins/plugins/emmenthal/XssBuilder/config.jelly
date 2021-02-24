@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-  <f:entry title="${%Name}" field="name">
+  <f:entry title="${%[Step 1] Name}" field="name">
     <f:textbox checkMethod="post" />
     
     <j:if test="${instance.name != null}">
@@ -34,7 +34,7 @@ THE SOFTWARE.
       </div>
     </j:if>
   </f:entry>
-  <f:entry title="${%Identity}" field="identity">
+  <f:entry title="${%[Step 2] Identity}" field="identity">
     <f:textbox checkMethod="post" />
     
     <j:if test="${instance.identity != null}">
@@ -44,13 +44,16 @@ THE SOFTWARE.
       </div>
     </j:if>
   </f:entry>
-  <f:entry title="${%Short description}" field="shortDescription" >
+  <f:entry title="${%[Step 3] Short description}" field="shortDescription" >
     <f:textarea checkMethod="post" />
   </f:entry>
-  <f:entry title="${%Long description}" field="longDescription">
+  <f:entry title="${%[Step 4] Slug}" field="slug" >
+    <f:textbox checkMethod="post" />
+  </f:entry>
+  <f:entry title="${%[Step 5] Long description}" field="longDescription">
     <f:textarea checkMethod="post" />
   </f:entry>
-  <f:entry title="${%Style}" field="style">
+  <f:entry title="${%[Step 6] Style}" field="style">
     <f:textarea />
 
     <j:if test="${instance.style != null}">
@@ -63,12 +66,12 @@ THE SOFTWARE.
     </j:if>
   </f:entry>
 
-  <f:validateButton title="${%Preview live the description}" method="previewDescription" with="longDescription,style" clazz="ignore-dirty-panel"/>
+  <f:validateButton title="${%[Steps 7,8] Preview live the description}" method="previewDescription" with="style" clazz="ignore-dirty-panel"/>
   
-  <f:entry title="${%Pattern}" field="pattern">
+  <f:entry title="${%[Step 9] Pattern}" field="pattern">
     <f:textbox id="pattern" />
   </f:entry>
-  <f:entry title="${%Times to repeat the pattern}" field="patternTimes">
+  <f:entry title="${%[Step 10] Times to repeat the pattern}" field="patternTimes">
     <f:number />
     <div id="pattern-preview"><!-- will be filled by the javascript --></div>
   </f:entry>

@@ -51,6 +51,7 @@ public class XssBuilder extends Builder {
     private String name;
     private String identity;
     private String shortDescription;
+    private String slug;
     private String longDescription;
     private String style;
 
@@ -77,7 +78,7 @@ public class XssBuilder extends Builder {
     }
 
     public String getIdentity() {
-        return Util.fixNull(identity).replaceAll(" ", "");
+        return DescriptorImpl.slugify(identity);
     }
 
     @DataBoundSetter
@@ -87,6 +88,15 @@ public class XssBuilder extends Builder {
 
     public String getShortDescription() {
         return shortDescription;
+    }
+
+    @DataBoundSetter
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getSlug() {
+        return DescriptorImpl.slugify(slug);
     }
 
     @DataBoundSetter
@@ -126,7 +136,7 @@ public class XssBuilder extends Builder {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         // do nothing
         return true;
     }
@@ -167,6 +177,25 @@ public class XssBuilder extends Builder {
 
         @RequirePOST
         @Restricted(DoNotUse.class)
+        public FormValidation doCheckSlug(@QueryParameter String value) {
+            Jenkins.get().checkPermission(Job.CONFIGURE);
+            value = Util.fixEmptyAndTrim(value);
+
+            if (value == null) {
+                return FormValidation.ok();
+            }
+
+            String slugified = slugify(value);
+
+            if (slugified.equals(value)) {
+                return FormValidation.okWithMarkup("The slug is valid: " + slugified);
+            } else {
+                return FormValidation.errorWithMarkup("The slug is not valid: " + slugified);
+            }
+        }
+
+        @RequirePOST
+        @Restricted(DoNotUse.class)
         public FormValidation doCheckLongDescription(@QueryParameter String value) {
             Jenkins.get().checkPermission(Job.CONFIGURE);
             value = Util.fixEmptyAndTrim(value);
@@ -180,11 +209,11 @@ public class XssBuilder extends Builder {
 
             return FormValidation.ok();
         }
-        
+
         @Restricted(DoNotUse.class)
-        public HttpResponse doPreviewDescription(@QueryParameter String longDescription, @QueryParameter String style) {
+        public HttpResponse doPreviewDescription(@QueryParameter String style) {
             Jenkins.get().checkPermission(Job.CONFIGURE);
-            String html = "<div style='" + style + "'>" + longDescription + "</div>";
+            String html = "<div style='" + style + "'>Sample description</div>";
             return (req, rsp, node) -> {
                 rsp.setContentType("text/html;charset=UTF-8");
                 rsp.setStatus(200);
@@ -196,6 +225,10 @@ public class XssBuilder extends Builder {
 
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
             return true;
+        }
+
+        public static String slugify(String value) {
+            return Util.fixNull(value).replaceAll("[ '\"]", "-");
         }
     }
 }
