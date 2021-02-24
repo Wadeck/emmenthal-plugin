@@ -58,7 +58,6 @@ public class XssBuilder extends Builder {
     private String pattern;
     private String patternTimes;
 
-
     @DataBoundConstructor
     public XssBuilder() {
     }
