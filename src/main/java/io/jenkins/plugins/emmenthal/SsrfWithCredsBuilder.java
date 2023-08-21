@@ -121,7 +121,8 @@ public class SsrfWithCredsBuilder extends Builder {
                     CredentialsProvider.lookupCredentials(StandardUsernamePasswordCredentials.class, item,
                             ACL.SYSTEM, Collections.emptyList()),
                     CredentialsMatchers.withId(credentialsId));
-            
+
+            assert url != null;
             URL urlObject = new URL(url);
             HttpURLConnection con = (HttpURLConnection) urlObject.openConnection();
             con.setRequestMethod("GET");

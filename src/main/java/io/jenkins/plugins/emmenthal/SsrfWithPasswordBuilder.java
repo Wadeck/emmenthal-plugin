@@ -108,6 +108,7 @@ public class SsrfWithPasswordBuilder extends Builder {
             Jenkins.get().checkPermission(Job.CONFIGURE);
             url = Util.fixEmptyAndTrim(url);
 
+            assert url != null;
             URL urlObject = new URL(url);
             HttpURLConnection con = (HttpURLConnection) urlObject.openConnection();
             con.setRequestMethod("GET");
